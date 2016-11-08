@@ -5,7 +5,7 @@ import riot from 'rollup-plugin-riot';
 import replace from 'rollup-plugin-replace'
 
 export default {
-    entry: 'main.js',
+    entry: './client/main.js',
     format: 'iife',
     sourceMap: true,
     plugins: [replace({'process.env.NODE_ENV': JSON.stringify( 'development' )}),

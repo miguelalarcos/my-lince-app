@@ -26,7 +26,7 @@ gulp.task('rollup', function() {
 });
 
 gulp.task('watch', ['rollup'], function() {
-  gulp.watch(['*.js','*.tag'], ['rollup']);
+  gulp.watch(['./client/*.js','./client/*.tag'], ['rollup']);
 });
 
 gulp.task('server', function () {

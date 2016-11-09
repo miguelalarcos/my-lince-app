@@ -1,12 +1,12 @@
-const Server = require('lince/server/ServerController').Server
+const Controller = require('lince/server/ServerController').Controller
 const start = require('lince/server/ServerActor').start
 
-class MyServer extends Server{
+class MyServer extends Controller{
     rpc_add_(a,b, callback){
         callback(a+b)
     }
-    subs_predicateA(){
-        return r.table('collection')
+    subs_todos(){
+        return r.table('todos')
     }
 }
 

@@ -15,5 +15,6 @@ export default {
         babel({"babelrc": false, "presets": ["es2015-rollup"]})
     ],
     moduleName: 'mobx',
+    exports: 'named',
     dest: 'mobx-bundle.js'
 };

@@ -1,5 +1,5 @@
-import {UImixin} from 'lince/client/uiActor.js'
-import {Observable} from 'mobx'
+import {UImixin, LinkMixin} from 'lince/client/uiActor.js'
+import {observable} from 'mobx'
 
 <string-input>
     <input onchange={onChange} value={value} />
@@ -30,6 +30,7 @@ import {Observable} from 'mobx'
 </todo-item>
 
 <app>
+    <h1>TODO list</h1>
     <string-input link={val} />
     <button onclick={onClick}>add</button>
     <br>
@@ -40,9 +41,10 @@ import {Observable} from 'mobx'
         this.subscribePredicate('unique id', 'todos', 'ALL')
         this.sortCmp = (a,b) => 1
 
-        this.val = Observable('')
+        this.val = observable('')
 
         onClick(evt){
+            console.log({desc: this.val.get(), done: false})
             this.dispatcher.tell('rpc', 'add', 'todos', {desc: this.val.get(), done: false})
         }
 

@@ -5,7 +5,7 @@ class MyServer extends Controller{
     rpc_add_(a,b, callback){
         callback(a+b)
     }
-    subs_todos(){
+    subs_todos(filter){
         return r.table('todos')
     }
     rpc_getLanguage(lang, c){

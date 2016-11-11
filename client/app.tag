@@ -19,6 +19,7 @@ import {Observable} from 'mobx'
     <style scoped>
         .done{
             text-decoration:line-through;
+            icon: pointer;
         }
     </style>
     <script>
@@ -42,11 +43,11 @@ import {Observable} from 'mobx'
         this.val = Observable('')
 
         onClick(evt){
-            this.dispatcher.rpc('add', 'todos', {desc: this.val.get(), done: false})
+            this.dispatcher.tell('rpc', 'add', 'todos', {desc: this.val.get(), done: false})
         }
 
         toggle(item){
-            this.dispatcher.rpc('update', 'todos', item.id, {done: !item.done})
+            this.dispatcher.tell('rpc', 'update', 'todos', item.id, {done: !item.done})
         }
 
     </script>

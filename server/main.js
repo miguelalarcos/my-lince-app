@@ -8,6 +8,9 @@ class MyServer extends Controller{
     subs_todos(){
         return r.table('todos')
     }
+    rpc_getLanguage(lang, c){
+        this.get('language', lang, c)
+    }
 }
 
 start(MyServer)

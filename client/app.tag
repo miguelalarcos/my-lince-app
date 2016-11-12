@@ -15,16 +15,16 @@ import {observable} from 'mobx'
 </string-input>
 
 <todo-item>
-    <div class={item.done ? 'done': ''} onclick={onClick}>{item.desc}</div>
+    <div class={"pointer " + (item.done ? 'done': '')} onclick={onClick}>{item.desc}</div>
     <style scoped>
         .done{
             text-decoration:line-through;
-            icon: pointer;
         }
+        .pointer{cursor: pointer;}
     </style>
     <script>
         onClick(evt){
-            this.parent.toggle(evt.item)
+            this.parent.toggle(evt.item.item)
         }
     </script>
 </todo-item>
@@ -44,8 +44,9 @@ import {observable} from 'mobx'
         this.val = observable('')
 
         onClick(evt){
-            console.log({desc: this.val.get(), done: false})
+            console.log('on click', {desc: this.val.get(), done: false})
             this.dispatcher.tell('rpc', 'add', 'todos', {desc: this.val.get(), done: false})
+            this.val.set('')
         }
 
         toggle(item){

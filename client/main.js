@@ -3,7 +3,7 @@ import {store} from 'lince/client/collectionStoreActor'
 import riot from 'riot'
 import './app.tag'
 
-store.newCollection('A')
-store.register('pA', 'A')
+store.newCollection('todos')
+store.register('todos', 'todos')
 
 riot.mount('app')

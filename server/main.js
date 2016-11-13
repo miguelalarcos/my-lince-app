@@ -14,7 +14,9 @@ class MyServer extends Controller{
         }
     }
     rpc_getLanguage(lang, c){
-        this.get('language', lang, c)
+        console.log('****************')
+        console.log(lang, c)
+        this.get('i18n', lang, c)
     }
 }
 

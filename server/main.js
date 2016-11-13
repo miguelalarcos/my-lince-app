@@ -6,7 +6,12 @@ class MyServer extends Controller{
         callback(a+b)
     }
     subs_todos(filter){
-        return r.table('todos')
+        if(filter == 'ALL'){
+            return r.table('todos')
+        }
+        else{
+            return r.table('todos').filter({done: filter == 'DONE'})
+        }
     }
     rpc_getLanguage(lang, c){
         this.get('language', lang, c)

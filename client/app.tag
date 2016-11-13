@@ -1,5 +1,5 @@
-import {UImixin, LinkMixin} from 'lince/client/uiActor.js'
-import {observable} from 'mobx'
+    import {UImixin, LinkMixin} from 'lince/client/uiActor.js'
+import {observable, autorun} from 'mobx'
 
 <string-input>
     <input onchange={onChange} value={value} />
@@ -30,7 +30,11 @@ import {observable} from 'mobx'
 </todo-item>
 
 <app>
-    <h1>TODO list</h1>
+    <div>
+        <button onclick={()=>this.filter.set('ALL')}>All</button>
+        <button onclick={()=>this.filter.set('PENDING')}>Pending</button>
+        <button onclick={()=>this.filter.set('DONE')}>Done</button>
+    </div>
     <string-input link={val} />
     <button onclick={onClick}>add</button>
     <br>
@@ -38,8 +42,13 @@ import {observable} from 'mobx'
 
     <script>
         this.mixin(UImixin(this))
-        this.subscribePredicate('unique id', 'todos', 'ALL')
-        this.sortCmp = (a,b) => 1
+
+        this.filter = observable('ALL')
+        autorun(() =>{
+            this.subscribePredicate('unique id', 'todos', this.filter.get())
+        })
+
+        this.sortCmp = (a,b) => a.desc <= b.desc ? 1: -1
 
         this.val = observable('')
 

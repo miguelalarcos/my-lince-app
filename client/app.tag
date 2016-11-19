@@ -1,22 +1,54 @@
 import {UImixin, LinkMixin} from 'lince/client/uiActor.js'
 import {i18nMixin} from 'lince/client/i18n.js'
 import {observable, autorun, asMap} from 'mobx'
+import {FormMixin} from 'lince/client/form.js'
 
 <string-input>
     <input onchange={onChange} value={value} />
     <script>
         this.mixin(LinkMixin(this))
         this.value = ''
-        this.link(this.opts.link, 'value')
+        if(this.opts.link){
+            this.link(this.opts.link, 'value')
+        }else{
+            this.linkMap(this.opts.maplink, this.opts.name, 'value')
+        }
 
         onChange(evt){
-            this.opts.link.set(evt.target.value)
+            if(this.opts.link){
+                this.opts.link.set(evt.target.value)
+            }else{
+                this.opts.maplink.set(this.opts.name, evt.target.value)
+            }
         }
     </script>
 </string-input>
 
+<my-todo-item-form>
+    <div>
+        <string-input mapLink={doc} name='desc' />
+        <button onclick={onClick}>save</button>
+    </div>
+    <script>
+        this.collection = 'todos'
+        this.mixin(FormMixin(this))
+        this.doc = observable(asMap(this.opts.doc))
+
+        onClick(evt){
+            this.save()
+            this.parent.doneEdit()
+        }
+    </script>
+</my-todo-item-form>
+
 <todo-item>
-    <div class={"pointer " + (item.done ? 'done': '')} onclick={onClick}>{item.desc}</div>
+    <div>
+        <span class={"pointer " + (item.done ? 'done': '')} onclick={onClick}>{item.desc}</span>
+        <button onclick={onEdit}>edit</button>
+        <div if={edit}>
+            <my-todo-item-form doc={item} />
+        </div>
+    </div>
     <style scoped>
         .done{
             text-decoration:line-through;
@@ -24,6 +56,13 @@ import {observable, autorun, asMap} from 'mobx'
         .pointer{cursor: pointer;}
     </style>
     <script>
+        this.edit = false
+        onEdit(evt){
+            this.edit = !this.edit
+        }
+        doneEdit(){
+            this.edit = false
+        }
         onClick(evt){
             this.parent.toggle(evt.item.item)
         }

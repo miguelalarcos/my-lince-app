@@ -14,9 +14,25 @@ class MyServer extends Controller{
         }
     }
     rpc_getLanguage(lang, c){
-        console.log('****************')
-        console.log(lang, c)
         this.get('i18n', lang, c)
+    }
+
+    canUpdate(collection, doc, next){
+        next()
+        //this.get(collection, doc.id).then((oldDoc)=>{
+            //if(oldDOc.owner == this.user) {
+        //        next()
+            //}
+        //})
+    }
+
+    beforeUpdate(collection, doc){
+        doc.updatedAt = new Date()
+        return doc
+    }
+
+    rpc_can(action, args){
+        return true
     }
 }
 

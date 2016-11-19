@@ -31,9 +31,10 @@ gulp.task('watch', ['rollup'], function() {
 
 gulp.task('server', function () {
   nodemon({
-    script: 'server/main.js'
-    , ext: 'js'
-    , watch: ['server/*.*']
-    , env: { 'NODE_ENV': 'development' }
+    script: 'server/main.js',
+    //args: ['--debug'],
+    ext: 'js',
+    watch: ['server/*.*'],
+    env: { 'NODE_ENV': 'development' }
   })
 })

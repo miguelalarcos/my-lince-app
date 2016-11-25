@@ -5,7 +5,7 @@ import {FormMixin} from 'lince/client/form.js'
 import 'lince/client/notifications.tag'
 
 <string-input>
-    <input onchange={onChange} value={value} />
+    <input onkeyup={onChange} value={value} />
     <script>
         this.mixin(LinkMixin(this))
         this.value = ''
@@ -28,12 +28,14 @@ import 'lince/client/notifications.tag'
 <my-static-todo-item-form>
     <div>
         <string-input mapLink={doc} name='desc' />
-        <button onclick={onClick}>save</button>
+        <span>{error_message_desc}</span>
+        <button disabled={!enabled} onclick={onClick}>save</button>
     </div>
     <script>
+        import {validateItem} from '../validation/validateItem.js'
         this.collection = 'todos'
         this.mixin(FormMixin(this))
-        this.initForm()
+        this.initForm(['desc'], validateItem)
 
         onClick(evt){
             this.save()
@@ -99,7 +101,7 @@ import 'lince/client/notifications.tag'
     <string-input link={val} />
     <button disabled={!this.enabled} onclick={onClick}>add</button>
     <br>
-    <!-- <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} /> -->
+    <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
     <br>
     <todo-item each={ item, i in items }></todo-item>
 
@@ -126,7 +128,6 @@ import 'lince/client/notifications.tag'
 
         this.enabled = true
         onClick(evt){
-            console.log('on click', {desc: this.val.get(), done: false})
             this.enabled = false
             this.dispatcher.ask('rpc', 'add', 'todos', {desc: this.val.get(), done: false}).then((ret)=>this.enabled = true)
             this.val.set('')

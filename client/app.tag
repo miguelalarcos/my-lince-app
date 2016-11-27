@@ -4,6 +4,28 @@ import {observable, autorun, asMap} from 'mobx'
 import {FormMixin} from 'lince/client/form.js'
 import 'lince/client/notifications.tag'
 
+<integer-input>
+    <input onkeyup={onChange} value={value} />
+    <script>
+        this.mixin(LinkMixin(this))
+        this.value = ''
+        if(this.opts.link){
+            this.link(this.opts.link, 'value')
+        }else{
+            this.linkMap(this.opts.maplink, this.opts.name, 'value')
+        }
+
+        onChange(evt){
+            let integer = /^[+-]?\d+$/.test(evt.target.value) ? parseInt(evt.target.value): evt.target.value
+            if(this.opts.link){
+                this.opts.link.set(integer)
+            }else{
+                this.opts.maplink.set(this.opts.name, integer)
+            }
+        }
+        </script>
+</integer-input>
+
 <string-input>
     <input onkeyup={onChange} value={value} />
     <script>
@@ -28,14 +50,29 @@ import 'lince/client/notifications.tag'
 <my-static-todo-item-form>
     <div>
         <string-input mapLink={doc} name='desc' />
-        <span>{error_message_desc}</span>
+        <span class='alert'>{error_message_desc}</span>
         <button disabled={!enabled} onclick={onClick}>save</button>
     </div>
+    <style scoped>
+        .alert{
+            font-style: italic;
+            color: red;
+        }
+    </style>
     <script>
         import {validateItem} from '../validation/validateItem.js'
         this.collection = 'todos'
         this.mixin(FormMixin(this))
         this.initForm(['desc'], validateItem)
+
+        beforeAdd(doc){
+            doc.done = false
+            return doc
+        }
+
+        afterSave(){
+            this.opts.rv.set(null)
+        }
 
         onClick(evt){
             this.save()
@@ -43,6 +80,7 @@ import 'lince/client/notifications.tag'
     </script>
 </my-static-todo-item-form>
 
+<!--
 <my-todo-item-form>
     <div>
         <string-input mapLink={doc} name='desc' />
@@ -59,14 +97,15 @@ import 'lince/client/notifications.tag'
         }
     </script>
 </my-todo-item-form>
+-->
 
 <todo-item>
     <div>
         <span class={"pointer " + (item.done ? 'done': '')} onclick={onClick}>{item.desc}</span>
         <button onclick={onEdit}>edit</button>
-        <div if={edit}>
+        <!--<div if={edit}>
             <my-todo-item-form doc={item} />
-        </div>
+        </div>-->
     </div>
     <style scoped>
         .done{
@@ -75,6 +114,7 @@ import 'lince/client/notifications.tag'
         .pointer{cursor: pointer;}
     </style>
     <script>
+        /*
         this.edit = false
         onEdit(evt){
             this.edit = !this.edit
@@ -83,8 +123,11 @@ import 'lince/client/notifications.tag'
         doneEdit(){
             this.edit = false
         }
+        */
+        import {dispatcher} from  'lince/client/dispatcherActor'
         onClick(evt){
-            this.parent.toggle(evt.item.item)
+            //this.parent.toggle(evt.item.item)
+            dispatcher.ask('rpc', 'update', 'todos', this.item.id, {done: !this.item.done})
         }
     </script>
 </todo-item>
@@ -98,9 +141,9 @@ import 'lince/client/notifications.tag'
         <button onclick={()=>this.filter.set('DONE')}>{t('DONE')}</button>
     </div>
     <div>{t(this.filter.get())}</div>
-    <string-input link={val} />
+    <!--<string-input link={val} />
     <button disabled={!this.enabled} onclick={onClick}>add</button>
-    <br>
+    <br>-->
     <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
     <br>
     <todo-item each={ item, i in items }></todo-item>
@@ -113,8 +156,19 @@ import 'lince/client/notifications.tag'
         this.i18nInit()
 
         this.filter = observable('ALL')
+
+        let todos_filter = (filter) => {
+            return (item) => {
+                if(filter == 'ALL'){
+                    return true
+                }else{
+                    return filter == 'DONE'? item.done: !item.done
+                }
+            }
+        }
+
         autorun(() =>{
-            this.subscribePredicate('unique id', 'todos', this.filter.get())
+            this.subscribePredicate(todos_filter, 'unique id', 'todos', this.filter.get())
         })
 
         this.sortCmp = (a,b) => (a.desc <= b.desc) ? 1: -1
@@ -126,7 +180,7 @@ import 'lince/client/notifications.tag'
             this.rvEdit.set(item.id)
         }
 
-        this.enabled = true
+        /*this.enabled = true
         onClick(evt){
             this.enabled = false
             this.dispatcher.ask('rpc', 'add', 'todos', {desc: this.val.get(), done: false}).then((ret)=>this.enabled = true)
@@ -136,6 +190,7 @@ import 'lince/client/notifications.tag'
         toggle(item){
             this.dispatcher.ask('rpc', 'update', 'todos', item.id, {done: !item.done})
         }
+        */
 
         toggleLanguage(evt){
             let lang = this.language.get()

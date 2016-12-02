@@ -18,6 +18,13 @@ gulp.task('mobx', function() {
       ;
 });
 
+gulp.task('moment', function() {
+    return rollup('moment.rollup.config.js')
+        .pipe(source('moment-bundle.js'))
+        .pipe(gulp.dest('./dist'))
+        ;
+});
+
 gulp.task('rollup', function() {
   return rollup('rollup.config.js')
     .pipe(source('bundle.js'))

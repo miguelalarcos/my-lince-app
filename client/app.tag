@@ -3,6 +3,7 @@ import {i18nMixin} from 'lince/client/i18n.js'
 import {observable, autorun, asMap} from 'mobx'
 import {FormMixin} from 'lince/client/form.js'
 import 'lince/client/notifications.tag'
+import 'lince/client/datePicker.tag'
 
 <integer-input>
     <input onkeyup={onChange} value={value} />
@@ -147,6 +148,9 @@ import 'lince/client/notifications.tag'
     <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
     <br>
     <todo-item each={ item, i in items }></todo-item>
+    <!--<br>
+    <date-input link={myDate}></date-input>
+    -->
 
     <script>
         this.mixin(UImixin(this))
@@ -156,6 +160,7 @@ import 'lince/client/notifications.tag'
         this.i18nInit()
 
         this.filter = observable('ALL')
+        this.myDate = observable(new Date())
 
         let todos_filter = (filter) => {
             return (item) => {

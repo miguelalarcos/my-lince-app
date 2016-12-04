@@ -13,17 +13,8 @@ class MyServer extends Controller{
             return r.table('todos').filter({done: filter == 'DONE'})
         }
     }
-    rpc_getLanguage(lang, c){
-        this.get('i18n', lang, c)
-    }
-
-    canUpdate(collection, doc, next){
-        next()
-        //this.get(collection, doc.id).then((oldDoc)=>{
-            //if(oldDOc.owner == this.user) {
-        //        next()
-            //}
-        //})
+    rpc_getLanguage(lang){
+        return this.get('i18n', lang)
     }
 
     beforeUpdate(collection, doc){

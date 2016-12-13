@@ -1,13 +1,10 @@
-import {UImixin, LinkMixin} from 'lince/client/uiActor.js'
-import {i18nMixin} from 'lince/client/i18n.js'
-import {observable, autorun, asMap} from 'mobx'
-import {FormMixin} from 'lince/client/form.js'
-import 'lince/client/notifications.tag'
-import 'lince/client/datePicker.tag'
+import {dispatcher} from  'lince/client/dispatcherActor'
+import {status} from 'lince/client/status'
 
 <integer-input>
     <input onkeyup={onChange} value={value} />
     <script>
+        import {LinkMixin} from 'lince/client/uiActor.js'
         this.mixin(LinkMixin(this))
         this.value = ''
         if(this.opts.link){
@@ -30,6 +27,7 @@ import 'lince/client/datePicker.tag'
 <string-input>
     <input onkeyup={onChange} value={value} />
     <script>
+        //import {LinkMixin} from 'lince/client/uiActor'
         this.mixin(LinkMixin(this))
         this.value = ''
         if(this.opts.link){
@@ -61,7 +59,9 @@ import 'lince/client/datePicker.tag'
         }
     </style>
     <script>
+        import {FormMixin} from 'lince/client/form'
         import {validateItem} from '../validation/validateItem.js'
+
         this.collection = 'todos'
         this.mixin(FormMixin(this))
         this.initForm(['desc'], validateItem)
@@ -81,32 +81,10 @@ import 'lince/client/datePicker.tag'
     </script>
 </my-static-todo-item-form>
 
-<!--
-<my-todo-item-form>
-    <div>
-        <string-input mapLink={doc} name='desc' />
-        <button onclick={onClick}>save</button>
-    </div>
-    <script>
-        this.collection = 'todos'
-        this.mixin(FormMixin(this))
-        this.doc = observable(asMap(this.opts.doc))
-
-        onClick(evt){
-            this.save()
-            this.parent.doneEdit()
-        }
-    </script>
-</my-todo-item-form>
--->
-
 <todo-item>
     <div>
         <span class={"pointer " + (item.done ? 'done': '')} onclick={onClick}>{item.desc}</span>
-        <button onclick={onEdit}>edit</button>
-        <!--<div if={edit}>
-            <my-todo-item-form doc={item} />
-        </div>-->
+        <button onclick={parent.onEdit}>edit</button>
     </div>
     <style scoped>
         .done{
@@ -115,26 +93,31 @@ import 'lince/client/datePicker.tag'
         .pointer{cursor: pointer;}
     </style>
     <script>
-        /*
-        this.edit = false
-        onEdit(evt){
-            this.edit = !this.edit
-            this.parent.onEdit(evt.item.item)
-        }
-        doneEdit(){
-            this.edit = false
-        }
-        */
-        import {dispatcher} from  'lince/client/dispatcherActor'
         onClick(evt){
-            //this.parent.toggle(evt.item.item)
             dispatcher.ask('rpc', 'update', 'todos', this.item.id, {done: !this.item.done})
         }
     </script>
 </todo-item>
 
+<login-form>
+    <div if={status.get() == "connected"}>
+        <string-input link={login}></string-input>
+        <button onclick={signin}>Sign in</button>
+    </div>
+    <script>
+        this.login = observable('')
+
+        signin(evt){
+            dispatcher.ask('rpc', 'login', this.login.get()).then((response)=>status.set('logged'))
+        }
+
+    </script>
+</login-form>
+
 <app>
+    <span>{status.get()}</span>
     <notifications-debug />
+    <login-form></login-form>
     <div>
         <button onclick={toggleLanguage}>es/en</button>
         <button onclick={()=>this.filter.set('ALL')}>{t('ALL')}</button>
@@ -148,11 +131,17 @@ import 'lince/client/datePicker.tag'
     <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
     <br>
     <todo-item each={ item, i in items }></todo-item>
-    <!--<br>
+    <br>
     <date-input link={myDate}></date-input>
-    -->
 
     <script>
+        this.status = status
+        import 'lince/client/notifications.tag'
+        import 'lince/client/datePicker.tag'
+        //import 'lince/client/login.tag'
+        import {i18nMixin} from 'lince/client/i18n.js'
+        import {UImixin} from 'lince/client/uiActor.js'
+        import {observable, autorun, asMap} from 'mobx'
         this.mixin(UImixin(this))
         this.mixin(LinkMixin(this))
         this.mixin(i18nMixin(this))
@@ -162,18 +151,8 @@ import 'lince/client/datePicker.tag'
         this.filter = observable('ALL')
         this.myDate = observable(new Date())
 
-        let todos_filter = (filter) => {
-            return (item) => {
-                if(filter == 'ALL'){
-                    return true
-                }else{
-                    return filter == 'DONE'? item.done: !item.done
-                }
-            }
-        }
-
         autorun(() =>{
-            this.subscribePredicate(todos_filter, 'unique id', 'todos', this.filter.get())
+            this.subscribePredicate('unique id', 'todos', this.filter.get())
         })
 
         this.sortCmp = (a,b) => (a.desc <= b.desc) ? 1: -1
@@ -181,21 +160,10 @@ import 'lince/client/datePicker.tag'
         this.val = observable('')
         this.rvEdit = observable(null)
 
-        onEdit(item){
-            this.rvEdit.set(item.id)
+        onEdit(evt){
+            console.log('onEdit, id', evt.item.item.id)
+            this.rvEdit.set(evt.item.item.id)
         }
-
-        /*this.enabled = true
-        onClick(evt){
-            this.enabled = false
-            this.dispatcher.ask('rpc', 'add', 'todos', {desc: this.val.get(), done: false}).then((ret)=>this.enabled = true)
-            this.val.set('')
-        }
-
-        toggle(item){
-            this.dispatcher.ask('rpc', 'update', 'todos', item.id, {done: !item.done})
-        }
-        */
 
         toggleLanguage(evt){
             let lang = this.language.get()

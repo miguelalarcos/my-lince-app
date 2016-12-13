@@ -6,5 +6,7 @@ export const validateItem = {
         else{
             return 'Al menos tres palabras'
         }
-    }
+    },
+    done: (val) => '',
+    id: (val) => ''
 }

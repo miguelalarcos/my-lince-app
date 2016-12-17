@@ -36,6 +36,8 @@ gulp.task('watch', ['rollup'], function() {
   gulp.watch(['./client/*.js','./client/*.tag', './validation/*.js'], ['rollup']);
 });
 
+gulp.task('vendors', ['mobx', 'moment', 'lodash']);
+
 gulp.task('server', function () {
   nodemon({
     script: 'server/main.js',

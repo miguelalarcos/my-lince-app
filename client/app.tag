@@ -62,9 +62,8 @@ import {status} from 'lince/client/status'
         import {FormMixin} from 'lince/client/form'
         import {validateItem} from '../validation/validateItem.js'
 
-        this.collection = 'todos'
         this.mixin(FormMixin(this))
-        this.initForm(['desc'], validateItem)
+        this.initForm('todos', ['desc'], validateItem)
 
         beforeAdd(doc){
             doc.done = false

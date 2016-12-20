@@ -1,5 +1,6 @@
 import {dispatcher} from  'lince/client/dispatcherActor'
 import {status} from 'lince/client/status'
+import {ws} from 'lince/client/webSocketActor'
 
 <integer-input>
     <input onkeyup={onChange} value={value} />
@@ -118,6 +119,8 @@ import {status} from 'lince/client/status'
     <notifications-debug />
     <login-form></login-form>
     <div>
+        <button if={this.status == 'disconnected'} onclick={()=>ws.connect()}>connect</button>
+        <button if={this.status == 'connected' || this.status == 'ready'} onclick={()=>ws.close()}>disconnect</button>
         <button onclick={toggleLanguage}>es/en</button>
         <button onclick={()=>this.filter.set('ALL')}>{t('ALL')}</button>
         <button onclick={()=>this.filter.set('PENDING')}>{t('PENDING')}</button>
@@ -149,6 +152,7 @@ import {status} from 'lince/client/status'
 
         this.filter = observable('ALL')
         this.myDate = observable(new Date())
+        this.link(status, 'status')
 
         autorun(() =>{
             this.subscribePredicate('unique id', 'todos', this.filter.get())

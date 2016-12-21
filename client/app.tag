@@ -138,6 +138,7 @@ import {ws} from 'lince/client/webSocketActor'
 
     <script>
         this.status = status
+        this.ws = ws
         import 'lince/client/notifications.tag'
         import 'lince/client/datePicker.tag'
         //import 'lince/client/login.tag'

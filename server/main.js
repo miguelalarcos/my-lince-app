@@ -1,3 +1,4 @@
+const Q = require('q')
 const Controller = require('lince/server/ServerController').Controller
 const start = require('lince/server/ServerActor').start
 
@@ -12,7 +13,7 @@ class MyServer extends Controller{
         }
     }
     rpc_getLanguage(lang){
-        return this.get('i18n', lang)
+        return Q({}) //this.get('i18n', lang)
     }
 
     beforeUpdate(collection, doc){
@@ -23,6 +24,11 @@ class MyServer extends Controller{
     rpc_can(action, args){
         return true
     }
+
+    can(...args){
+        return Q(true)
+    }
+
 }
 
 start(MyServer)

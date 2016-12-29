@@ -13,7 +13,7 @@ class MyServer extends Controller{
         }
     }
     rpc_getLanguage(lang){
-        return Q({}) //this.get('i18n', lang)
+        return this.get('i18n', lang)
     }
 
     beforeUpdate(collection, doc){

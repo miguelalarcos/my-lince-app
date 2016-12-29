@@ -1,7 +1,9 @@
 import {dispatcher} from  'lince/client/dispatcherActor'
 import {status} from 'lince/client/status'
-import {ws} from 'lince/client/webSocketActor'
+//import {ws} from 'lince/client/webSocketActor'
+import 'lince/client/inputs.tag'
 
+<!--
 <integer-input>
     <input onkeyup={onChange} value={value} />
     <script>
@@ -46,6 +48,7 @@ import {ws} from 'lince/client/webSocketActor'
         }
     </script>
 </string-input>
+-->
 
 <my-static-todo-item-form>
     <div>
@@ -71,12 +74,12 @@ import {ws} from 'lince/client/webSocketActor'
             return doc
         }
 
-        afterSave(){
-            this.opts.rv.set(null)
-        }
+        //afterSave(){
+        //    this.opts.rv.set(null)
+        //}
 
         onClick(evt){
-            this.save()
+            this.save().then(()=>this.opts.rv.set(null))
         }
     </script>
 </my-static-todo-item-form>
@@ -93,14 +96,17 @@ import {ws} from 'lince/client/webSocketActor'
         .pointer{cursor: pointer;}
     </style>
     <script>
+        //import {AUDMixin} from 'lince/client/uiActor'
+        //this.mixin(AUDMixin(this))
         onClick(evt){
+            //this.update('todos', this.item.id, {done: !this.item.done})
             dispatcher.ask('rpc', 'update', 'todos', this.item.id, {done: !this.item.done})
         }
     </script>
 </todo-item>
 
 <login-form>
-    <div if={status.get() == "connected"}>
+    <div>
         <string-input link={login}></string-input>
         <button onclick={signin}>Sign in</button>
     </div>
@@ -108,64 +114,59 @@ import {ws} from 'lince/client/webSocketActor'
         this.login = observable('')
 
         signin(evt){
-            dispatcher.ask('rpc', 'login', this.login.get()).then((response)=>status.set('logged'))
+            dispatcher.login(this.login.get())
         }
 
     </script>
 </login-form>
 
 <app>
-    <span>{status.get()}</span>
+    <span>{status}</span>
     <notifications-debug />
-    <login-form></login-form>
-    <div>
-        <button if={this.status == 'disconnected'} onclick={()=>ws.connect()}>connect</button>
-        <button if={this.status == 'connected' || this.status == 'ready'} onclick={()=>ws.close()}>disconnect</button>
+    <login-form> if={status == "connected"}</login-form>
+    <div if={status == "logged"}>
         <button onclick={toggleLanguage}>es/en</button>
         <button onclick={()=>this.filter.set('ALL')}>{t('ALL')}</button>
         <button onclick={()=>this.filter.set('PENDING')}>{t('PENDING')}</button>
         <button onclick={()=>this.filter.set('DONE')}>{t('DONE')}</button>
+
+        <div>{t(this.filter.get())}</div>
+
+        <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
+        <br>
+        <todo-item each={ item, i in items }></todo-item>
+        <br>
     </div>
-    <div>{t(this.filter.get())}</div>
-    <!--<string-input link={val} />
-    <button disabled={!this.enabled} onclick={onClick}>add</button>
-    <br>-->
-    <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
-    <br>
-    <todo-item each={ item, i in items }></todo-item>
-    <br>
-    <date-input link={myDate}></date-input>
+    <!--<date-input link={myDate}></date-input>-->
 
     <script>
-        this.status = status
-        this.ws = ws
         import 'lince/client/notifications.tag'
-        import 'lince/client/datePicker.tag'
-        //import 'lince/client/login.tag'
+        //import 'lince/client/datePicker.tag'
+        import 'lince/client/login.tag'
         import {i18nMixin} from 'lince/client/i18n.js'
         import {UImixin} from 'lince/client/uiActor.js'
+        import {LinkMixin} from 'lince/client/uiActor'
         import {observable, autorun, asMap} from 'mobx'
         this.mixin(UImixin(this))
         this.mixin(LinkMixin(this))
         this.mixin(i18nMixin(this))
 
-        this.i18nInit()
+        //this.i18nInit()
 
         this.filter = observable('ALL')
-        this.myDate = observable(new Date())
+        //this.myDate = observable(new Date())
         this.link(status, 'status')
 
         autorun(() =>{
-            this.subscribePredicate('unique id', 'todos', this.filter.get())
+            this.subscribe('unique id', 'todos', this.filter.get())
         })
 
-        this.sortCmp = (a,b) => (a.desc <= b.desc) ? 1: -1
+        this.orderBy = [['desc'], ['asc']] // desc is description
 
         this.val = observable('')
         this.rvEdit = observable(null)
 
         onEdit(evt){
-            console.log('onEdit, id', evt.item.item.id)
             this.rvEdit.set(evt.item.item.id)
         }
 

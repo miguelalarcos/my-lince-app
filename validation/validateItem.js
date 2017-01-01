@@ -1,4 +1,4 @@
-export const validateItem = {
+const validateItem = {
     desc: (val) => {
         if(/^\w+\s+\w+\s+\w+.*$/.test(val)){
             return ''
@@ -8,5 +8,10 @@ export const validateItem = {
         }
     },
     done: (val) => '',
-    id: (val) => ''
+    id: (val) => '',
+    validate: (doc) => {
+        return validateItem.desc(doc.desc) == ''
+    }
 }
+
+module.exports.validateItem = validateItem

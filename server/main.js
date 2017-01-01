@@ -1,6 +1,7 @@
 const Q = require('q')
 const Controller = require('lince/server/ServerController').Controller
 const start = require('lince/server/ServerActor').start
+const validateItem = require('../validation/validateItem').validateItem
 
 class MyServer extends Controller{
 
@@ -21,14 +22,26 @@ class MyServer extends Controller{
         return doc
     }
 
-    rpc_can(action, args){
-        return true
+    beforeAdd(collection, doc){
+        doc.userId = this.userId
+        return doc
     }
 
-    can(...args){
-        return Q(true)
+    can(type, collection, doc){
+        if(this.userId) {
+            return Q(true)
+        }
+        else{
+            return super.call(type, collection, doc)
+        }
     }
 
+    check(collection, doc){
+        if(collection == 'todos'){
+            return validateItem.validate(doc)
+        }
+        return super.check(collection, doc)
+    }
 }
 
 start(MyServer)

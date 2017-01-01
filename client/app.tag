@@ -1,54 +1,6 @@
 import {dispatcher} from  'lince/client/dispatcherActor'
 import {status} from 'lince/client/status'
-//import {ws} from 'lince/client/webSocketActor'
 import 'lince/client/inputs.tag'
-
-<!--
-<integer-input>
-    <input onkeyup={onChange} value={value} />
-    <script>
-        import {LinkMixin} from 'lince/client/uiActor.js'
-        this.mixin(LinkMixin(this))
-        this.value = ''
-        if(this.opts.link){
-            this.link(this.opts.link, 'value')
-        }else{
-            this.linkMap(this.opts.maplink, this.opts.name, 'value')
-        }
-
-        onChange(evt){
-            let integer = /^[+-]?\d+$/.test(evt.target.value) ? parseInt(evt.target.value): evt.target.value
-            if(this.opts.link){
-                this.opts.link.set(integer)
-            }else{
-                this.opts.maplink.set(this.opts.name, integer)
-            }
-        }
-        </script>
-</integer-input>
-
-<string-input>
-    <input onkeyup={onChange} value={value} />
-    <script>
-        //import {LinkMixin} from 'lince/client/uiActor'
-        this.mixin(LinkMixin(this))
-        this.value = ''
-        if(this.opts.link){
-            this.link(this.opts.link, 'value')
-        }else{
-            this.linkMap(this.opts.maplink, this.opts.name, 'value')
-        }
-
-        onChange(evt){
-            if(this.opts.link){
-                this.opts.link.set(evt.target.value)
-            }else{
-                this.opts.maplink.set(this.opts.name, evt.target.value)
-            }
-        }
-    </script>
-</string-input>
--->
 
 <my-static-todo-item-form>
     <div>
@@ -74,10 +26,6 @@ import 'lince/client/inputs.tag'
             return doc
         }
 
-        //afterSave(){
-        //    this.opts.rv.set(null)
-        //}
-
         onClick(evt){
             this.save().then(()=>this.opts.rv.set(null))
         }
@@ -96,11 +44,9 @@ import 'lince/client/inputs.tag'
         .pointer{cursor: pointer;}
     </style>
     <script>
-        //import {AUDMixin} from 'lince/client/uiActor'
-        //this.mixin(AUDMixin(this))
         onClick(evt){
-            //this.update('todos', this.item.id, {done: !this.item.done})
-            dispatcher.ask('rpc', 'update', 'todos', this.item.id, {done: !this.item.done})
+            //dispatcher.ask('rpc', 'update', 'todos', this.item.id, {done: !this.item.done})
+            dispatcher.update('todos', this.item.id, {done: !this.item.done})
         }
     </script>
 </todo-item>
@@ -123,7 +69,7 @@ import 'lince/client/inputs.tag'
 <app>
     <span>{status}</span>
     <notifications-debug />
-    <login-form> if={status == "connected"}</login-form>
+    <login-form if={status == "connected"}></login-form>
     <div if={status == "logged"}>
         <button onclick={toggleLanguage}>es/en</button>
         <button onclick={()=>this.filter.set('ALL')}>{t('ALL')}</button>
@@ -146,7 +92,7 @@ import 'lince/client/inputs.tag'
         import {i18nMixin} from 'lince/client/i18n.js'
         import {UImixin} from 'lince/client/uiActor.js'
         import {LinkMixin} from 'lince/client/uiActor'
-        import {observable, autorun, asMap} from 'mobx'
+        import {observable, autorun} from 'mobx'
         this.mixin(UImixin(this))
         this.mixin(LinkMixin(this))
         this.mixin(i18nMixin(this))

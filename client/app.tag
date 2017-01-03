@@ -27,7 +27,9 @@ import 'lince/client/inputs.tag'
         }
 
         onClick(evt){
-            this.save().then(()=>this.opts.rv.set(null))
+            this.save().then(()=>{
+                this.opts.rv.set(null)
+            })
         }
     </script>
 </my-static-todo-item-form>
@@ -35,7 +37,7 @@ import 'lince/client/inputs.tag'
 <todo-item>
     <div>
         <span class={"pointer " + (item.done ? 'done': '')} onclick={onClick}>{item.desc}</span>
-        <button onclick={parent.onEdit}>edit</button>
+        <button if={sameUser()} onclick={parent.onEdit}>edit</button>
     </div>
     <style scoped>
         .done{
@@ -44,8 +46,10 @@ import 'lince/client/inputs.tag'
         .pointer{cursor: pointer;}
     </style>
     <script>
+        sameUser(){
+            return this.item.userId == dispatcher.userId
+        }
         onClick(evt){
-            //dispatcher.ask('rpc', 'update', 'todos', this.item.id, {done: !this.item.done})
             dispatcher.update('todos', this.item.id, {done: !this.item.done})
         }
     </script>

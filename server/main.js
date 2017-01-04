@@ -5,6 +5,11 @@ const validateItem = require('../validation/validateItem').validateItem
 
 class MyServer extends Controller{
 
+    setUp(){
+        this.permission('todos').canUpdate = (doc) => this.userId == doc.userId
+        this.permission('todos').canAdd = (doc) => this.userId != null
+    }
+
     subs_todos(filter){
         if(filter == 'ALL'){
             return r.table('todos')
@@ -27,7 +32,7 @@ class MyServer extends Controller{
         return doc
     }
 
-    can(type, collection, doc){
+    _can(type, collection, doc){
         if(this.userId) {
             return Q(true)
         }

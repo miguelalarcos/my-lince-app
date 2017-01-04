@@ -85,7 +85,6 @@ import 'lince/client/inputs.tag'
         <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
         <br>
         <todo-item each={ item, i in items }></todo-item>
-        <br>
     </div>
     <!--<date-input link={myDate}></date-input>-->
 
@@ -113,7 +112,6 @@ import 'lince/client/inputs.tag'
 
         this.orderBy = [['desc'], ['asc']] // desc is description
 
-        this.val = observable('')
         this.rvEdit = observable(null)
 
         onEdit(evt){

@@ -38,6 +38,7 @@ import 'lince/client/inputs.tag'
     <div>
         <span class={"pointer " + (item.done ? 'done': '')} onclick={onClick}>{item.desc}</span>
         <button if={sameUser()} onclick={parent.onEdit}>edit</button>
+        <button if={sameUser()} onclick={onDelete}>delete</button>
     </div>
     <style scoped>
         .done{
@@ -51,6 +52,9 @@ import 'lince/client/inputs.tag'
         }
         onClick(evt){
             dispatcher.update('todos', this.item.id, {done: !this.item.done})
+        }
+        onDelete(evt){
+            dispatcher.delete('todos', this.item.id)
         }
     </script>
 </todo-item>
@@ -79,6 +83,7 @@ import 'lince/client/inputs.tag'
         <button onclick={()=>this.filter.set('ALL')}>{t('ALL')}</button>
         <button onclick={()=>this.filter.set('PENDING')}>{t('PENDING')}</button>
         <button onclick={()=>this.filter.set('DONE')}>{t('DONE')}</button>
+        <button onclick={allDone}>All done</button>
 
         <div>{t(this.filter.get())}</div>
 
@@ -116,6 +121,11 @@ import 'lince/client/inputs.tag'
 
         onEdit(evt){
             this.rvEdit.set(evt.item.item.id)
+        }
+
+        allDone(){
+            //dispatcher.ask('rpc', 'allDone')
+            dispatcher.remote('allDone')
         }
 
         toggleLanguage(evt){

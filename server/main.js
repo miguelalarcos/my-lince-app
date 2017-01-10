@@ -8,6 +8,7 @@ class MyServer extends Controller{
     setUp(){
         this.permission('todos').canUpdate = (doc) => this.userId == doc.userId
         this.permission('todos').canAdd = (doc) => this.userId != null
+        this.permission('todos').canDelete = (doc) => this.userId == doc.userId
     }
 
     subs_todos(filter){
@@ -32,13 +33,8 @@ class MyServer extends Controller{
         return doc
     }
 
-    _can(type, collection, doc){
-        if(this.userId) {
-            return Q(true)
-        }
-        else{
-            return super.call(type, collection, doc)
-        }
+    rpc_allDone(){
+        r.table('todos').filter({userId: this.userId}).update({done: true}).run(this.conn)
     }
 
     check(collection, doc){

@@ -61,14 +61,21 @@ import 'lince/client/inputs.tag'
 
 <login-form>
     <div>
-        <string-input link={login}></string-input>
+        User: <string-input link={login}></string-input>
+        Password: <string-input link={password}></string-input>
         <button onclick={signin}>Sign in</button>
+        <button onClick={createUser}>Create</button>
     </div>
     <script>
         this.login = observable('')
+        this.password = observable('')
 
         signin(evt){
-            dispatcher.login(this.login.get())
+            dispatcher.login(this.login.get(), this.password.get())
+        }
+
+        createUser(evt){
+            dispatcher.createUser(this.login.get(), this.password.get())
         }
 
     </script>
@@ -78,7 +85,7 @@ import 'lince/client/inputs.tag'
     <span>{status}</span>
     <notifications-debug />
     <login-form if={status == "connected"}></login-form>
-    <div if={status == "logged"}>
+    <!--<div if={status == "logged"}>-->
         <button onclick={toggleLanguage}>es/en</button>
         <button onclick={()=>this.filter.set('ALL')}>{t('ALL')}</button>
         <button onclick={()=>this.filter.set('PENDING')}>{t('PENDING')}</button>
@@ -87,10 +94,10 @@ import 'lince/client/inputs.tag'
 
         <div>{t(this.filter.get())}</div>
 
-        <my-static-todo-item-form rv={rvEdit} predicateid={"unique id"} />
+        <my-static-todo-item-form rv={rvEdit} /> <!--predicateid={"unique id"} />-->
         <br>
         <todo-item each={ item, i in items }></todo-item>
-    </div>
+    <!--</div>-->
     <!--<date-input link={myDate}></date-input>-->
 
     <script>

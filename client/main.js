@@ -17,5 +17,4 @@ let todos_filter = (filter) => {
 }
 offline.register('todos', todos_filter)
 
-
 riot.mount('app')
